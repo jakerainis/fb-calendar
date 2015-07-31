@@ -1,0 +1,54 @@
+{
+  "name": "GenuineInit",
+  "version": "2.0.0",
+  "description": "Genuine's front-end starting point",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:genuine/init.git"
+  },
+  "browser": {
+    "customSelect": "./app/scripts/libs/jquery.customSelect.js"
+  },
+  "browserify": {
+    "transform": [
+      "babelify",
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "customSelect": {
+      "depends": [
+        "jquery:jQuery"
+      ]
+    }
+  },
+  "devDependencies": {
+    "babelify": "^6.1.2",
+    "browser-sync": "^2.7.1",
+    "browserify": "~5.10.1",
+    "browserify-shim": "~3.7.0",
+    "gulp": "^3.8.7",
+    "gulp-autoprefixer": "^2.0.0",
+    "gulp-changed": "^0.4.1",
+    "gulp-compass": "^2.0.4",
+    "gulp-if": "^1.2.5",
+    "gulp-imagemin": "^0.6.2",
+    "gulp-include": "^1.1.1",
+    "gulp-notify": "^1.4.2",
+    "gulp-ruby-sass": "^0.7.1",
+    "gulp-sass": "^2.0.0",
+    "gulp-sourcemaps": "^1.2.8",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.0",
+    "merge-stream": "^0.1.7",
+    "pretty-hrtime": "~0.2.1",
+    "require-dir": "^0.1.0",
+    "underscore": "^1.8.3",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "~0.1.1",
+    "watchify": "~1.0.2"
+  },
+  "dependencies": {
+    "jquery": "^2.1.4"
+  }
+}

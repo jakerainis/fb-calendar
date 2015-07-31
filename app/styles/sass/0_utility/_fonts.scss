@@ -1,0 +1,34 @@
+/*
+==========================================================================
+Web Fonts
+========================================================================== */
+/**
+     * FOR REFERENCE: Font-weights by numeric value / name. Side note: it is recommended that we to use the numeric value here to help clarify exactly which weight is getting referenced to.
+     * 100 = thin
+     * 200 = extra-light
+     * 300 = light
+     * 400 = normal, book
+     * 500 = medium
+     * 600 = demi-bold / semi-bold
+     * 700 = bold
+     * 800 = heavy / extra-bold / heavy
+     * 900 = black / extra-black / ultra-black
+     * Generic (non-explicitly weighted fonts, like a font-icon). Just default to using a regular font-weight:
+     */
+/**
+* Include Icon Fonts
+*/
+@include font-face("icomoon", font-files( "/fonts/icomoon/icomoon.woff", "/fonts/icomoon/icomoon.ttf"), "/fonts/icomoon/icomoon.eot", 400, normal);
+
+/**
+* Include Web Fonts
+*/
+@include font-face("MrEavesModern-Regular", font-files("/fonts/mreavesmodern/mreavesmodr-020415006EmigreWebOnly.woff", "/fonts/mreavesmodern/mreavesmodr-020415006EmigreWebOnly.woff2"), "/fonts/mreavesmodern/mreavesmodr-020415006EmigreWebOnly.eot", normal, normal);
+@include font-face("MrEavesModern-Book", font-files("/fonts/mreavesmodern/mreavesmodbk-020415006EmigreWebOnly.woff", "/fonts/mreavesmodern/mreavesmodbk-020415006EmigreWebOnly.woff2"), "/fonts/mreavesmodern/mreavesmodbk-020415006EmigreWebOnly.eot", normal, normal);
+@include font-face("MrEavesModern-BookItalic", font-files("/fonts/mreavesmodern/mreavesmodbki-020415006EmigreWebOnly.woff", "/fonts/mreavesmodern/mreavesmodbki-020415006EmigreWebOnly.woff2"), "/fonts/mreavesmodern/mreavesmodbki-020415006EmigreWebOnly.eot", normal, normal);
+@include font-face("MrEavesModern-Bold", font-files("/fonts/mreavesmodern/mreavesmodb-020415006EmigreWebOnly.woff", "/fonts/mreavesmodern/mreavesmodb-020415006EmigreWebOnly.woff2"), "/fonts/mreavesmodern/mreavesmodb-020415006EmigreWebOnly.eot", normal, normal);
+$sansRegular: "MrEavesModern-Regular", Helvetica, Arial, sans-serif;
+$sansBook: "MrEavesModern-Book", Helvetica, Arial, sans-serif;
+$sansItalic: "MrEavesModern-BookItalic", Helvetica, Arial, sans-serif;
+$sansBold: "MrEavesModern-Bold", Helvetica, Arial, sans-serif;
+$icomoon: "icomoon";
