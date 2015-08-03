@@ -32,8 +32,10 @@
       width:600px;
       .calendar-wrapper__item{
         background-color: crimson;
+        border:1px solid #000;
         color:#fff;
         font-size:12px;
+        opacity:.4;
         position:absolute;
         width:100%;
         span{

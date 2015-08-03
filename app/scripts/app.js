@@ -8,88 +8,108 @@ var data = [
   {id : 2, start : 100, end : 240},
   {id : 3, start : 200, end : 410},
   {id : 4, start : 220, end : 450},
-  {id : 5, start : 400, end : 620},
+  {id : 5, start : 400, end : 720},
   {id : 6, start : 600, end : 650},
-  {id : 7, start : 680, end : 720} 
+  {id : 7, start : 680, end : 720},
+  {id : 8, start : 680, end : 720} 
 ];
 
 var util = {
+  assignColumn: function(events, itemIdx){
+    let item = events[itemIdx];
+    if(itemIdx === 0){
+      return 0;
+    }
+    let prevItem = events[itemIdx-1];
+    if(util.checkForOverlap(item, prevItem)){
+      prevItem = events[itemIdx-1]
+      return prevItem.column + 1;
+    } else{
+      return 0;
+    }
+  },
+  buildColumnArray: function(events){
+    var arr = [];
+    events.forEach(function(v,i){
+      arr.push(v.column);
+    });
+    return arr;
+  },
   checkForOverlap: function(e1, e2){
     if (e1.id === e2.id){
       return false;
     }
-    else if (e1.end > e2.start && e2.end > e1.start) {
+    else if (e1.end >= e2.start && e2.end >= e1.start) {
       return true;
     } else {
       return false;
     }
   },
-  traverseOverlaps: function(event, arr){
-    var consecutives = 0;
-    var subConsecutives;
-    console.log('event ' + event.id + ' overlaps with ' + event.overlappedIds);
-    event.overlappedIds.forEach(function(v,i){
-
-      arr[v-1].overlappedIds.forEach(function(w,j){
-        if (w !== event.id){
-          consecutives +=1;
-          console.log('id: ', arr[w-1]);
-          //subConsecutives = util.traverseOverlaps(arr[w-1], arr);
-        }
-      });
-      if(arr[arr.length -1 ].id !== event.id){
-        //util.tranverseOverlaps
-      }
-      // var id;
-      // arr.forEach(function(w,j){
-      //   if (w.id = v){
-      //     id
-      //   }
-      // });
-    });
-    //console.log(event.id, consecutives);
-    return consecutives + subConsecutives;
+  getHighestInArray: function(arr){
+    return Math.max.apply(null, arr);
   }
 };
 
 function layOutDay(events) {
   var arr = [];
+  var columnSet = [];
   events.forEach(function(v,i){
-    var overlappedIds = [];
+    var overlappedEvents = [];
+    v.column = 0;
+    v.column = util.assignColumn(events, i);
     events.forEach(function(w,j){
       if(util.checkForOverlap(v,w)){
-        overlappedIds.push(w.id);
+        overlappedEvents.push(j);
       }
     });
     arr.push({
+      column: v.column,
       height: v.end - v.start,
       id: v.id,
       info: v,
-      overlappedIds: overlappedIds,
-      top: v.start,
-      width: 600/(overlappedIds.length + 1)
+      overlappedEvents: overlappedEvents,
+      top: v.start
     });
   });
-  arr.forEach(function(v,i){
-      v.consecOverlaps = util.traverseOverlaps(v, arr);
-
-      // var prevEvent = arr[i-1];
-      // console.log(prevEvent.width);
-      // console.log(prevEvent.info.end > v.info.start);
-      // if(prevEvent.info.end < v.info.start){
-      //   v.left = 0;
-      //   console.log(prevEvent.info.id);
-      // }else{
-      //   v.left = prevEvent.width;
-      // }
+  events.forEach(function(v,i){
+    columnSet.push(v.column);
   });
+  var highest = util.getHighestInArray(columnSet);
+  arr.forEach(function(v,i){
+    v.left = (600/(highest+1)) * v.column;
+    v.width = (600/highest-20); //20 is column padding
+    console.log(v.id + ' overlaps: ' + v.overlappedEvents)
+  });
+  arr.forEach(function(v,i){
+    var highestCol = [];
+    v.overlappedEvents.forEach(function(w,j){
+      console.log(arr[w])
+     highestCol.push(arr[w].column);
+    });
+    highestCol = util.getHighestInArray(highestCol);
+    var highestColOffset = arr[highestCol].left;
+    //v.left = highestColOffset / v.overlappedEvents.length - 1;
+    // v.width = highestColOffset / v.overlappedEvents.length - 1;
+    // for(var j = 0; j < overlappedEvents.length -1 ; j++ ){
+    //   v.left = 
+    // }
+    // if its not conflicting with something in the next column
+    // and its not the last column (create global for column total)
+    // count the conflicting events in previous columns (var conflicts)
+    // apply equal widths (highest conflicting column.left / conflicting prev columns)
+    // this gets width
+    // for each one width is applied to, left = i * equal width number 
+  });
+
 
   return arr;
 }
 
 function render(events){
   events.forEach(function(v,i){
-    var el = '<div class="calendar-wrapper__item" data-id="' + v.id + '">' + v.id + ' overlaps with ' + v.overlappedIds + '</div>';
+    var el = '<div class="calendar-wrapper__item" data-id="' + v.id + '">' +
+      'Event ID: ' + v.id + ' || Column: ' + v.column +
+      '</div>';
     $('.calendar-wrapper').append(el);
     $('[data-id="' + v.id + '"]').css({
       height: v.height,
