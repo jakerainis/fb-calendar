@@ -11,29 +11,40 @@ var _underscore = require('underscore');
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var data = [{ id: 0, start: 0, end: 50 }, { id: 1, start: 60, end: 120 }, { id: 2, start: 100, end: 240 }, { id: 3, start: 200, end: 410 }, { id: 4, start: 220, end: 450 }, { id: 45, start: 220, end: 250 }, { id: 5, start: 400, end: 720 }, { id: 6, start: 300, end: 650 }, { id: 7, start: 680, end: 720 }, { id: 8, start: 680, end: 720 }];
+var data = [
+//{id : 0, start : 0, end : 50},
+{ id: 1, start: 60, end: 120 }, { id: 2, start: 100, end: 240 }, { id: 3, start: 200, end: 410 }, { id: 4, start: 220, end: 450 }, { id: 5, start: 400, end: 720 }, { id: 6, start: 300, end: 650 }, { id: 7, start: 680, end: 720 }, { id: 8, start: 680, end: 720 }];
 
 var util = {
   assignColumn: function assignColumn(events, itemIdx) {
+    var col = 0;
     var item = events[itemIdx];
-    if (itemIdx === 0) {
-      return 0;
-    }
     var prevItem = events[itemIdx - 1];
-    if (util.checkForOverlap(item, prevItem)) {
-      prevItem = events[itemIdx - 1];
-      return prevItem.column + 1;
+    if (itemIdx === 0) {
+      col = 0;
+    } else if (util.checkForOverlap(item, prevItem)) {
+      for (var key in util.columnIndex) {
+        console.log(prevItem.column);
+        console.log(util.columnIndex[key]);
+      }
+      col = prevItem.column + 1;
     } else {
-      return 0;
+      col = 0;
     }
+    if (!util.columnIndex[col]) {
+      util.columnIndex[col] = [];
+    }
+    util.columnIndex[col].push(itemIdx);
+    // console.log(util.columnIndex[col]);
+    return col;
   },
-  buildColumnArray: function buildColumnArray(events) {
-    var arr = [];
-    events.forEach(function (v, i) {
-      arr.push(v.column);
-    });
-    return arr;
-  },
+  // buildColumnArray: function(events){
+  //   var arr = [];
+  //   events.forEach(function(v,i){
+  //     arr.push(v.column);
+  //   });
+  //   return arr;
+  // },
   checkForOverlap: function checkForOverlap(e1, e2) {
     if (e1.id === e2.id) {
       return false;
@@ -42,6 +53,9 @@ var util = {
     } else {
       return false;
     }
+  },
+  columnIndex: {
+    0: []
   },
   getColumnArray: function getColumnArray(cols) {
     var arr = [];
@@ -60,54 +74,54 @@ var util = {
 
 function layOutDay(events) {
   var arr = [];
-  var columnSet = [];
   events.forEach(function (v, i) {
     var overlappedEvents = [];
-    v.column = 0;
-    v.column = util.assignColumn(events, i);
     events.forEach(function (w, j) {
       if (util.checkForOverlap(v, w)) {
         overlappedEvents.push(j);
       }
     });
     arr.push({
-      column: v.column,
+      end: v.end,
       height: v.end - v.start,
       id: v.id,
-      info: v,
       overlappedEvents: overlappedEvents,
-      top: v.start
+      start: v.start
     });
   });
-  events.forEach(function (v, i) {
-    columnSet.push(v.column);
-  });
-  var highest = util.getHighestInArray(columnSet);
   arr.forEach(function (v, i) {
+    v.column = util.assignColumn(arr, i);
+  });
+  console.log(util.columnIndex);
+  console.log(arr);
+  arr.forEach(function (v, i) {
+    var columnSet = [];
+    arr.forEach(function (v, i) {
+      columnSet.push(v.column);
+    });
+    var highest = util.getHighestInArray(columnSet);
     v.left = 600 / (highest + 1) * v.column;
     v.width = 600 / (highest + 1); //20 is column padding
     if (!v.overlappedEvents.length) {
       v.width = 600;
     }
-    console.log('event ' + (v.id - 1) + ' overlaps: ' + v.overlappedEvents);
-  });
-  arr.forEach(function (v, i) {
-    var conflictedCols = [];
-    v.overlappedEvents.forEach(function (w, j) {
-      conflictedCols.push(arr[w].column);
-      //console.log('id: ' + v.id, v.column, arr[w].column - 1 ,util.getTotalColumns(arr))
-    });
-    console.log(i, conflictedCols);
-    var highestCol = util.getHighestInArray(conflictedCols);
-    var nextHighestCol = 0;
-    if (conflictedCols.length > 1) {
-      nextHighestCol = util.getHighestInArray(_underscore2['default'].without(conflictedCols, highestCol));
-    }
-    if (v.column > nextHighestCol && v.column < highestCol) {
-      console.log('hello', i, v.column);
-    }
-
-    console.log(i, v.overlappedEvents, highestCol, nextHighestCol);
+    console.log('event ' + (v.id - 1) + ' overlaps: ' + v.overlappedEvents, v);
+    // let conflictedCols = [];
+    // v.overlappedEvents.forEach(function(w,j){
+    //   conflictedCols.push(arr[w].column);
+    //   //console.log('id: ' + v.id, v.column, arr[w].column - 1 ,util.getTotalColumns(arr))
+    // });
+    // console.log(i, conflictedCols);
+    // let highestCol = util.getHighestInArray(conflictedCols);
+    // let nextHighestCol = 0;
+    // if(conflictedCols.length > 1){
+    //   nextHighestCol = util.getHighestInArray(_.without(conflictedCols, highestCol));
+    // }
+    // if(v.column > nextHighestCol  && v.column < highestCol){
+    //   console.log('hello', i, v.column);
+    // }
+    //
+    // console.log(i, v.overlappedEvents, highestCol, nextHighestCol);
     // var highestCol = [];
     // v.overlappedEvents.forEach(function(w,j){
     //   console.log(arr[w]);
@@ -140,7 +154,7 @@ function render(events) {
     (0, _jquery2['default'])('[data-id="' + v.id + '"]').css({
       height: v.height,
       left: v.left,
-      top: v.top,
+      top: v.start,
       width: v.width
     });
   });
