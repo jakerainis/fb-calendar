@@ -9,14 +9,26 @@ var data = [
   {id : 2, start : 100, end : 240},
   {id : 3, start : 200, end : 410},
   {id : 4, start : 220, end : 450},
-  // {id : 5, start : 400, end : 720},
-  // {id : 6, start : 300, end : 650},
-  // {id : 7, start : 680, end : 720},
-  // {id : 8, start : 680, end : 720} 
+  {id : 5, start : 400, end : 720},
+  {id : 6, start : 300, end : 650},
+  {id : 7, start : 680, end : 720},
+  {id : 8, start : 680, end : 720} 
 ];
+
+//Joe's Data
+// var data = [
+//   {id : 1, start : 60, end : 120},  // an event from 10am to 11am
+//   {id : 2, start : 60, end : 120}, // an event from 10:40am to 1pm
+//   {id : 3, start : 100, end : 240},  // an event from 8:40pm to 9pm
+//   {id : 4, start : 150, end : 260},
+//   {id : 5, start : 280, end : 500},  // an event from 8:40pm to 9pm
+//   {id : 6, start : 300, end : 500},
+//   {id : 7, start : 60, end : 700}
+// ];
 
 var util = {
   assignColumn: function(arr, itemIdx){
+    var foundEmptyColumn = false;
     var col;
     var item = arr[itemIdx];
     var prevItem = arr[itemIdx-1];
@@ -24,29 +36,28 @@ var util = {
       col = 0;
     } else if(util.checkForOverlap(item, prevItem)){
 
-      var conflictsArray = [];
 
       //for every column
+
       for(var key in util.columnIndex){
         //check each item in the column
         var intersections = _.intersection(util.columnIndex[key], item.overlappedEvents);
-        // console.log('event', itemIdx, 'index ' + key, util.columnIndex[key], item.overlappedEvents);
-        // console.log('index ' + key, intersections, 'for event ', itemIdx);
-        if (!intersections.length){
-          //console.log(itemIdx, key);
+        // if there are no intersections in column, put it in that column
+        if (!intersections.length && !foundEmptyColumn){
+          var foundEmptyColumn = true;
           col = parseInt(key);
         }
       }
+
+      //it was not put into a column or does not exist in the first column...
       if(!col && col !== 0 ){
 
+        //so we increment it from the prev column because we know it overlaps
         col = prevItem.column + 1;
+        //Then we check to see if it overlaps with anything in the new existing column
         if(util.recursiveCheckForOverlap(arr, itemIdx, col)){
-          console.log(itemIdx, col);
           col += 1;
           util.recursiveCheckForOverlap(arr, itemIdx, col);
-          console.log(col, '???')
-        }else{
-          console.log(col, '!!!');
         }
       }
     } else{
@@ -61,29 +72,14 @@ var util = {
     return col;
   },
   recursiveCheckForOverlap: function(arr, itemIdx, col){
-    //console.log(itemIdx, arr[itemIdx].overlappedEvents, col);
-    var overlaps;
+    var overlaps = false;
+    console.log(itemIdx);
     arr[itemIdx].overlappedEvents.forEach(function(v,i){
-      //console.log(arr[v], arr[v].column)
-      // for(var key in arr[v]){
-      //   console.log(key, key[key]);
-      // }
-      //console.log(v,itemIdx, arr[v].column, col);
-      ////WTF does arr[v].column come up undefined?
-      if(v < itemIdx){
-        console.log(arr[v].column, col);
-        if(arr[v].column === col){
-          console.log(true);
-          overlaps = true;
-        } else {
-          overlaps = false;
-        }
-      }
-      // if(v < itemIdx && arr[v].column === col){
-      //   overlaps = true;
-      // } else {
-      //   overlaps = false;
-      // }
+      if(v < itemIdx && arr[v].column === col){
+        console.log(arr[v].column, arr[itemIdx].overlappedEvents, col);
+        //console.log(true);
+        overlaps = true;
+      } 
     });
     console.log(overlaps);
     return overlaps;
@@ -134,8 +130,8 @@ function layOutDay(events) {
   arr.forEach(function(v,i){
     v.column = util.assignColumn(arr, i);
   });
-  console.log(util.columnIndex);
-  console.log(arr);
+  //console.log(util.columnIndex);
+  //console.log(arr);
   arr.forEach(function(v,i){
     var columnSet = [];
     arr.forEach(function(v,i){
