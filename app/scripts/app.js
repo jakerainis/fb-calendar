@@ -9,42 +9,85 @@ var data = [
   {id : 2, start : 100, end : 240},
   {id : 3, start : 200, end : 410},
   {id : 4, start : 220, end : 450},
-  {id : 5, start : 400, end : 720},
-  {id : 6, start : 300, end : 650},
-  {id : 7, start : 680, end : 720},
-  {id : 8, start : 680, end : 720} 
+  // {id : 5, start : 400, end : 720},
+  // {id : 6, start : 300, end : 650},
+  // {id : 7, start : 680, end : 720},
+  // {id : 8, start : 680, end : 720} 
 ];
 
 var util = {
-  assignColumn: function(events, itemIdx){
-    let col = 0;
-    let item = events[itemIdx];
-    let prevItem = events[itemIdx-1];
+  assignColumn: function(arr, itemIdx){
+    var col;
+    var item = arr[itemIdx];
+    var prevItem = arr[itemIdx-1];
     if(itemIdx === 0){
       col = 0;
     } else if(util.checkForOverlap(item, prevItem)){
+
+      var conflictsArray = [];
+
+      //for every column
       for(var key in util.columnIndex){
-        console.log(prevItem.column);
-        console.log(util.columnIndex[key]);
+        //check each item in the column
+        var intersections = _.intersection(util.columnIndex[key], item.overlappedEvents);
+        // console.log('event', itemIdx, 'index ' + key, util.columnIndex[key], item.overlappedEvents);
+        // console.log('index ' + key, intersections, 'for event ', itemIdx);
+        if (!intersections.length){
+          //console.log(itemIdx, key);
+          col = parseInt(key);
+        }
       }
-      col = prevItem.column + 1;
+      if(!col && col !== 0 ){
+
+        col = prevItem.column + 1;
+        if(util.recursiveCheckForOverlap(arr, itemIdx, col)){
+          console.log(itemIdx, col);
+          col += 1;
+          util.recursiveCheckForOverlap(arr, itemIdx, col);
+          console.log(col, '???')
+        }else{
+          console.log(col, '!!!');
+        }
+      }
     } else{
       col = 0;
     }
+
     if(!util.columnIndex[col]){
       util.columnIndex[col] = [];
     }
     util.columnIndex[col].push(itemIdx);
-    // console.log(util.columnIndex[col]);
+
     return col;
   },
-  // buildColumnArray: function(events){
-  //   var arr = [];
-  //   events.forEach(function(v,i){
-  //     arr.push(v.column);
-  //   });
-  //   return arr;
-  // },
+  recursiveCheckForOverlap: function(arr, itemIdx, col){
+    //console.log(itemIdx, arr[itemIdx].overlappedEvents, col);
+    var overlaps;
+    arr[itemIdx].overlappedEvents.forEach(function(v,i){
+      //console.log(arr[v], arr[v].column)
+      // for(var key in arr[v]){
+      //   console.log(key, key[key]);
+      // }
+      //console.log(v,itemIdx, arr[v].column, col);
+      ////WTF does arr[v].column come up undefined?
+      if(v < itemIdx){
+        console.log(arr[v].column, col);
+        if(arr[v].column === col){
+          console.log(true);
+          overlaps = true;
+        } else {
+          overlaps = false;
+        }
+      }
+      // if(v < itemIdx && arr[v].column === col){
+      //   overlaps = true;
+      // } else {
+      //   overlaps = false;
+      // }
+    });
+    console.log(overlaps);
+    return overlaps;
+  },
   checkForOverlap: function(e1, e2){
     if (e1.id === e2.id){
       return false;
@@ -55,9 +98,7 @@ var util = {
       return false;
     }
   },
-  columnIndex: {
-    0: []
-  },
+  columnIndex: {},
   getColumnArray: function(cols){
     var arr = [];
     cols.forEach(function(v,i){
