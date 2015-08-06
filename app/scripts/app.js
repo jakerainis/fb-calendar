@@ -42,10 +42,7 @@ LayoutDay.prototype = {
         //...so we increment it from the prev column because we know it overlaps
         col = prevItem.column + 1;
         //Then we check to see if it overlaps with anything in the new existing column
-        if (this.recursiveCheckForOverlap(arr, itemIdx, col)) {
-          col += 1;
-          this.recursiveCheckForOverlap(arr, itemIdx, col);
-        }
+        col = this.recursiveColumnCheck(arr, itemIdx, col);
       }
     } else {
       col = 0;
@@ -110,7 +107,7 @@ LayoutDay.prototype = {
   checkForOverlap: function(e1, e2) {
     if (e1.id === e2.id) {
       return false;
-    } else if (e1.end >= e2.start && e2.end >= e1.start) {
+    } else if (e1.end > e2.start && e2.end > e1.start) {
       return true;
     } else {
       return false;
@@ -131,7 +128,7 @@ LayoutDay.prototype = {
    * @param  {number} col - Index of a column
    * @return {boolean} - If the event overlaps with an item in the column
    */
-  recursiveCheckForOverlap: function(arr, itemIdx, col) {
+  checkColumnOverlap: function(arr, itemIdx, col) {
     var overlaps = false;
     arr[itemIdx].overlappedEvents.forEach(function(v, i) {
       if (v < itemIdx && arr[v].column === col) {
@@ -139,6 +136,23 @@ LayoutDay.prototype = {
       }
     });
     return overlaps;
+  },
+
+  /**
+   * Calculates empty column for event item placement.
+   * @param  {array} arr - Array of event items
+   * @param  {number} itemIdx - Index of an event item
+   * @param  {number} col - Index of a column
+   * @return {column} - The column to place event item in
+   */
+  recursiveColumnCheck: function(arr, itemIdx, col){
+    var column = col;
+    if (this.checkColumnOverlap(arr, itemIdx, column)) {
+      column += 1;
+    }else{
+      return column;
+    }
+    return(this.recursiveColumnCheck(arr, itemIdx, column));
   },
 
   /**
@@ -165,12 +179,28 @@ LayoutDay.prototype = {
 
 //Instantiate with date
 var layoutDay = new LayoutDay([
-  { id: 1, start: 60, end: 120 }, 
-  { id: 2, start: 100, end: 240 }, 
-  { id: 3, start: 200, end: 410 }, 
-  { id: 4, start: 220, end: 450 }, 
-  { id: 5, start: 400, end: 720 }, 
-  { id: 6, start: 300, end: 650 }, 
-  { id: 7, start: 680, end: 720 }, 
-  { id: 8, start: 680, end: 720 }
+  // { id: 1, start: 60, end: 120 }, 
+  // { id: 2, start: 100, end: 240 }, 
+  // { id: 3, start: 200, end: 410 }, 
+  // { id: 4, start: 220, end: 450 }, 
+  // { id: 5, start: 400, end: 720 }, 
+  // { id: 6, start: 300, end: 650 }, 
+  // { id: 7, start: 680, end: 720 }, 
+  // { id: 8, start: 680, end: 720 }
+  { id: 1, start: 10, end: 90 },
+  { id: 2, start: 20, end: 80 },
+  { id: 3, start: 70, end: 180 },
+  { id: 4, start: 90, end: 180 },
+  { id: 5, start: 200, end: 270 },
+  { id: 6, start: 230, end: 290 },
+  { id: 7, start: 300, end: 340 },
+  { id: 8, start: 350, end: 400 },
+  { id: 9, start: 370, end: 580 },
+  { id: 10, start: 410, end: 480 },
+  { id: 11, start: 450, end: 590 },
+  { id: 12, start: 500, end: 595 },
+  { id: 13, start: 530, end: 590 },
+  { id: 14, start: 600, end: 660 },
+  { id: 15, start: 650, end: 690 },
+  { id: 16, start: 670, end: 710 }
 ]);
